@@ -1,0 +1,4 @@
+<!-- App strings. Keep names short and quiet, like the launcher. -->
+<resources>
+    <string name="app_name">Still Notes</string>
+</resources>
