@@ -9,13 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.chuds.stillnotes.data.FontPreset
@@ -27,6 +28,7 @@ import dev.chuds.stillnotes.data.deriveTitle
 import dev.chuds.stillnotes.data.importFromUris
 import dev.chuds.stillnotes.data.writeBodyToUri
 import dev.chuds.stillnotes.data.writeZipToUri
+import dev.chuds.stillnotes.ui.components.LocalHaptics
 import dev.chuds.stillnotes.ui.list.NotesListScreen
 import dev.chuds.stillnotes.ui.list.NotesListViewModel
 import dev.chuds.stillnotes.ui.note.NoteScreen
@@ -152,7 +154,19 @@ fun StillNotesApp(incomingSharedText: String? = null) {
 
     val typography = remember(settings.fontPreset) { stillTypographyFor(settings.fontPreset) }
 
-    CompositionLocalProvider(LocalStillTypography provides typography) {
+    val hapticFeedback = LocalHapticFeedback.current
+    val hapticPerformer: () -> Unit = remember(settings.hapticsEnabled, hapticFeedback) {
+        if (settings.hapticsEnabled) {
+            { hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove) }
+        } else {
+            {}
+        }
+    }
+
+    CompositionLocalProvider(
+        LocalStillTypography provides typography,
+        LocalHaptics provides hapticPerformer,
+    ) {
         when (val current = route) {
             Route.List -> {
                 val listViewModel: NotesListViewModel = viewModel(
@@ -185,10 +199,8 @@ fun StillNotesApp(incomingSharedText: String? = null) {
             }
 
             Route.Settings -> {
-                val notesCount by notesRepository.notes.collectAsState(initial = emptyList())
                 SettingsScreen(
                     settings = settings,
-                    notesCount = notesCount.size,
                     onCycleFontPreset = {
                         scope.launch {
                             val next = when (settings.fontPreset) {
@@ -203,6 +215,11 @@ fun StillNotesApp(incomingSharedText: String? = null) {
                     onTogglePreviewByDefault = {
                         scope.launch {
                             preferencesRepository.setPreviewByDefault(!settings.previewByDefault)
+                        }
+                    },
+                    onToggleHaptics = {
+                        scope.launch {
+                            preferencesRepository.setHapticsEnabled(!settings.hapticsEnabled)
                         }
                     },
                     onExportAll = ::startExportAll,

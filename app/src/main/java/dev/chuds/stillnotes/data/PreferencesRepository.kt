@@ -19,12 +19,14 @@ private val Context.preferencesDataStore: DataStore<Preferences> by preferencesD
 
 private val FONT_PRESET_KEY = stringPreferencesKey("font_preset")
 private val PREVIEW_BY_DEFAULT_KEY = booleanPreferencesKey("preview_by_default")
+private val HAPTICS_ENABLED_KEY = booleanPreferencesKey("haptics_enabled")
 
 enum class FontPreset { System, Editorial, Terminal, Grotesk }
 
 data class NotesSettings(
     val fontPreset: FontPreset = FontPreset.System,
     val previewByDefault: Boolean = false,
+    val hapticsEnabled: Boolean = true,
 )
 
 class PreferencesRepository(private val context: Context) {
@@ -39,6 +41,7 @@ class PreferencesRepository(private val context: Context) {
                     ?.let { runCatching { FontPreset.valueOf(it) }.getOrNull() }
                     ?: FontPreset.System,
                 previewByDefault = prefs[PREVIEW_BY_DEFAULT_KEY] ?: false,
+                hapticsEnabled = prefs[HAPTICS_ENABLED_KEY] ?: true,
             )
         }
 
@@ -48,5 +51,9 @@ class PreferencesRepository(private val context: Context) {
 
     suspend fun setPreviewByDefault(value: Boolean) {
         context.preferencesDataStore.edit { it[PREVIEW_BY_DEFAULT_KEY] = value }
+    }
+
+    suspend fun setHapticsEnabled(value: Boolean) {
+        context.preferencesDataStore.edit { it[HAPTICS_ENABLED_KEY] = value }
     }
 }

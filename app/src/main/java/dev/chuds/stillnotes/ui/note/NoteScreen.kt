@@ -2,8 +2,6 @@ package dev.chuds.stillnotes.ui.note
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
@@ -40,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chuds.stillnotes.markdown.MarkdownBlockContent
 import dev.chuds.stillnotes.markdown.parseBlocks
+import dev.chuds.stillnotes.ui.components.StillVerb
 import dev.chuds.stillnotes.ui.theme.StillColors
 import dev.chuds.stillnotes.ui.theme.StillTypography
 import kotlinx.coroutines.launch
@@ -167,7 +165,6 @@ fun NoteScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FooterBar(
     modifier: Modifier = Modifier,
@@ -178,11 +175,6 @@ private fun FooterBar(
     onExport: () -> Unit,
     onToggleMode: () -> Unit,
 ) {
-    val backInteraction = remember { MutableInteractionSource() }
-    val toggleInteraction = remember { MutableInteractionSource() }
-    val shareInteraction = remember { MutableInteractionSource() }
-    val exportInteraction = remember { MutableInteractionSource() }
-
     Column(
         modifier = modifier.background(StillColors.OledBlack),
     ) {
@@ -197,52 +189,30 @@ private fun FooterBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 18.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 14.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "back",
-                style = StillTypography.SecondaryMenu,
-                color = StillColors.MutedWhite,
-                modifier = Modifier.combinedClickable(
-                    interactionSource = backInteraction,
-                    indication = null,
-                    onClick = onBack,
-                ),
+            StillVerb(
+                label = "back",
+                onClick = onBack,
+                bordered = true,
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "share",
-                    style = StillTypography.SecondaryMenu,
-                    color = StillColors.MutedWhite,
-                    modifier = Modifier.combinedClickable(
-                        interactionSource = shareInteraction,
-                        indication = null,
-                        onClick = onShare,
-                    ),
-                )
-                Spacer(Modifier.width(18.dp))
-                Text(
-                    text = "export",
-                    style = StillTypography.SecondaryMenu,
-                    color = StillColors.MutedWhite,
-                    modifier = Modifier.combinedClickable(
-                        interactionSource = exportInteraction,
-                        indication = null,
-                        onClick = onExport,
-                    ),
-                )
-            }
-            Text(
-                text = if (editing) "preview" else "edit",
-                style = StillTypography.SecondaryMenu,
+            StillVerb(
+                label = "share",
+                onClick = onShare,
+                bordered = true,
+            )
+            StillVerb(
+                label = "export",
+                onClick = onExport,
+                bordered = true,
+            )
+            StillVerb(
+                label = if (editing) "preview" else "edit",
+                onClick = onToggleMode,
+                bordered = true,
                 color = StillColors.SoftWhite,
-                modifier = Modifier.combinedClickable(
-                    interactionSource = toggleInteraction,
-                    indication = null,
-                    onClick = onToggleMode,
-                ),
             )
         }
     }

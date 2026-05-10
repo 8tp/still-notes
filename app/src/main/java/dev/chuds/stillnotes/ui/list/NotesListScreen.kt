@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chuds.stillnotes.data.Note
 import dev.chuds.stillnotes.ui.components.StillDivider
+import dev.chuds.stillnotes.ui.components.StillVerb
 import dev.chuds.stillnotes.ui.theme.StillColors
 import dev.chuds.stillnotes.ui.theme.StillTypography
 import java.text.SimpleDateFormat
@@ -354,7 +355,6 @@ private fun NoteRow(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FooterActions(
     modifier: Modifier = Modifier,
@@ -363,44 +363,27 @@ private fun FooterActions(
     onToggleSearch: () -> Unit,
     onNew: () -> Unit,
 ) {
-    val settingsInteraction = remember { MutableInteractionSource() }
-    val searchInteraction = remember { MutableInteractionSource() }
-    val newInteraction = remember { MutableInteractionSource() }
-
     Row(
-        modifier = modifier.padding(horizontal = 24.dp, vertical = 22.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier.padding(horizontal = 14.dp, vertical = 18.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = "settings",
-            style = StillTypography.SecondaryMenu,
-            color = StillColors.MutedWhite,
-            modifier = Modifier.combinedClickable(
-                interactionSource = settingsInteraction,
-                indication = null,
-                onClick = onSettings,
-            ),
+        StillVerb(
+            label = "settings",
+            onClick = onSettings,
+            bordered = true,
         )
-        Text(
-            text = if (searching) "close" else "search",
-            style = StillTypography.SecondaryMenu,
+        StillVerb(
+            label = if (searching) "close" else "search",
+            onClick = onToggleSearch,
+            bordered = true,
             color = if (searching) StillColors.SoftWhite else StillColors.MutedWhite,
-            modifier = Modifier.combinedClickable(
-                interactionSource = searchInteraction,
-                indication = null,
-                onClick = onToggleSearch,
-            ),
         )
-        Text(
-            text = "new",
-            style = StillTypography.SecondaryMenu,
+        StillVerb(
+            label = "new",
+            onClick = onNew,
+            bordered = true,
             color = StillColors.SoftWhite,
-            modifier = Modifier.combinedClickable(
-                interactionSource = newInteraction,
-                indication = null,
-                onClick = onNew,
-            ),
         )
     }
 }
