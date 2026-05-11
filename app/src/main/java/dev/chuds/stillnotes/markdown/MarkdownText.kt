@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import dev.chuds.stillnotes.ui.theme.LocalStillTypography
 import dev.chuds.stillnotes.ui.theme.StillColors
 import dev.chuds.stillnotes.ui.theme.StillTypography
+import java.net.URI
+import java.util.Locale
 
 /**
  * Render markdown source as a Compose column. Block-level dispatch with inline parsing
@@ -263,12 +265,19 @@ private fun LinkAwareText(
 }
 
 private fun openUrl(context: Context, url: String) {
+    if (!isBrowserUrl(url)) return
     runCatching {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
     }
+}
+
+internal fun isBrowserUrl(url: String): Boolean {
+    val scheme = runCatching { URI(url).scheme?.lowercase(Locale.US) }.getOrNull()
+        ?: return false
+    return scheme == "http" || scheme == "https"
 }
 
 private fun copyToClipboard(context: Context, text: String, label: String) {
@@ -279,4 +288,3 @@ private fun copyToClipboard(context: Context, text: String, label: String) {
         Toast.makeText(context, "copied", Toast.LENGTH_SHORT).show()
     }
 }
-
