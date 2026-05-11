@@ -96,6 +96,20 @@ class MarkdownInlineTest {
         assertEquals(listOf("public", "later"), tags)
     }
 
+    @Test
+    fun extractTagsIgnoresHashMarkersInsideMarkdownLinkDestinations() {
+        val tags = extractTags("[site](https://example.com/#private) #public")
+
+        assertEquals(listOf("public"), tags)
+    }
+
+    @Test
+    fun extractTagsKeepsLinkTextTagsWhileMaskingNestedLinkDestinations() {
+        val tags = extractTags("[#visible](https://example.com/a_(b)#hidden) #later")
+
+        assertEquals(listOf("visible", "later"), tags)
+    }
+
     private fun AnnotatedString.hasSpan(
         text: String,
         predicate: (androidx.compose.ui.text.SpanStyle) -> Boolean,

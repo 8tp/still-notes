@@ -62,7 +62,7 @@ private val CODE_FENCE = Regex("^```\\s*([A-Za-z0-9_+-]*)\\s*$")
 
 fun extractTags(body: String): List<String> {
     val seen = LinkedHashSet<String>()
-    TAG_REGEX.findAll(body.withoutCodeSpans()).forEach { match ->
+    TAG_REGEX.findAll(body.withoutCodeSpans().withoutMarkdownLinkDestinations()).forEach { match ->
         // Skip "# heading" pattern: a hash at line start followed by a space.
         val tag = match.groupValues[1]
         seen += tag.lowercase()
@@ -119,6 +119,52 @@ private fun String.withoutCodeSpans(): String {
 
     flushPlain()
     return out.toString()
+}
+
+private fun String.withoutMarkdownLinkDestinations(): String {
+    val out = StringBuilder(length)
+    var i = 0
+    while (i < length) {
+        if (this[i] == ']' && i + 1 < length && this[i + 1] == '(') {
+            val destinationStart = i + 2
+            val destinationEnd = findMarkdownLinkDestinationEnd(destinationStart)
+            if (destinationEnd != -1) {
+                out.append("](")
+                for (j in destinationStart until destinationEnd) {
+                    val c = this[j]
+                    out.append(if (c == '\n' || c == '\r') c else ' ')
+                }
+                out.append(')')
+                i = destinationEnd + 1
+                continue
+            }
+        }
+        out.append(this[i])
+        i++
+    }
+    return out.toString()
+}
+
+private fun String.findMarkdownLinkDestinationEnd(start: Int): Int {
+    var depth = 1
+    var i = start
+    while (i < length) {
+        when (this[i]) {
+            '\\' -> i += 2
+            '\n', '\r' -> return -1
+            '(' -> {
+                depth++
+                i++
+            }
+            ')' -> {
+                depth--
+                if (depth == 0) return i
+                i++
+            }
+            else -> i++
+        }
+    }
+    return -1
 }
 
 private fun String.withoutInlineCodeSpans(): String {
