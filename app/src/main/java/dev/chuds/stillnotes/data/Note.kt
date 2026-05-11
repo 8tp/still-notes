@@ -58,6 +58,7 @@ fun derivePreview(body: String): String {
  * register as tags. Tag bodies are letters, digits, dashes, and underscores.
  */
 private val TAG_REGEX = Regex("(?:^|[^A-Za-z0-9_#])#([A-Za-z][A-Za-z0-9_-]{0,40})\\b")
+private val CODE_FENCE = Regex("^```\\s*([A-Za-z0-9_+-]*)\\s*$")
 
 fun extractTags(body: String): List<String> {
     val seen = LinkedHashSet<String>()
@@ -71,20 +72,36 @@ fun extractTags(body: String): List<String> {
 
 private fun String.withoutCodeSpans(): String {
     val out = StringBuilder(length)
-    var i = 0
+    var lineStart = 0
     var inFence = false
+
+    while (lineStart <= length) {
+        val newline = indexOf('\n', startIndex = lineStart)
+        val lineEnd = if (newline == -1) length else newline
+        val line = substring(lineStart, lineEnd)
+        val isFence = CODE_FENCE.matchEntire(line.trimEnd()) != null
+
+        when {
+            isFence -> {
+                repeat(line.length) { out.append(' ') }
+                inFence = !inFence
+            }
+            inFence -> repeat(line.length) { out.append(' ') }
+            else -> out.append(line.withoutInlineCodeSpans())
+        }
+
+        if (newline == -1) break
+        out.append('\n')
+        lineStart = newline + 1
+    }
+
+    return out.toString()
+}
+
+private fun String.withoutInlineCodeSpans(): String {
+    val out = StringBuilder(length)
+    var i = 0
     while (i < length) {
-        if (startsWith("```", startIndex = i)) {
-            inFence = !inFence
-            repeat(3) { out.append(' ') }
-            i += 3
-            continue
-        }
-        if (inFence) {
-            out.append(if (this[i] == '\n') '\n' else ' ')
-            i++
-            continue
-        }
         if (this[i] == '`') {
             val end = indexOf('`', startIndex = i + 1)
             if (end != -1) {

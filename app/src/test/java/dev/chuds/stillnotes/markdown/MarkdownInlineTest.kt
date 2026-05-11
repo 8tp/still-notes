@@ -61,6 +61,22 @@ class MarkdownInlineTest {
         assertEquals(listOf("public", "later"), tags)
     }
 
+    @Test
+    fun extractTagsKeepsLiteralBackticksInsideFencedCodeBlocksMasked() {
+        val tags = extractTags(
+            """
+            Keep #public.
+            ```kotlin
+            val literalFence = "``` #private"
+            // #also_private
+            ```
+            Then keep #later.
+            """.trimIndent(),
+        )
+
+        assertEquals(listOf("public", "later"), tags)
+    }
+
     private fun AnnotatedString.hasSpan(
         text: String,
         predicate: (androidx.compose.ui.text.SpanStyle) -> Boolean,
