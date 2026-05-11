@@ -110,6 +110,21 @@ class MarkdownInlineTest {
         assertEquals(listOf("visible", "later"), tags)
     }
 
+    @Test
+    fun parsesNestedParenthesesInMarkdownLinkDestinations() {
+        val parsed = parseInline(
+            source = "[site](https://example.com/a_(b)#hidden) #public",
+            monoFont = null,
+            codeColor = Color.White,
+            codeBackground = Color.Black,
+            linkColor = Color.Cyan,
+        )
+
+        assertEquals("site #public", parsed.text)
+        val link = parsed.getStringAnnotations(tag = "URL", start = 0, end = "site".length).single()
+        assertEquals("https://example.com/a_(b)#hidden", link.item)
+    }
+
     private fun AnnotatedString.hasSpan(
         text: String,
         predicate: (androidx.compose.ui.text.SpanStyle) -> Boolean,

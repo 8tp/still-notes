@@ -82,7 +82,7 @@ fun parseInline(
         if (c == '[') {
             val labelEnd = source.indexOf(']', i + 1)
             if (labelEnd != -1 && labelEnd + 1 < n && source[labelEnd + 1] == '(') {
-                val urlEnd = source.indexOf(')', labelEnd + 2)
+                val urlEnd = findLinkDestinationEnd(source, labelEnd + 2)
                 if (urlEnd != -1) {
                     val label = source.substring(i + 1, labelEnd)
                     val url = source.substring(labelEnd + 2, urlEnd)
@@ -100,6 +100,28 @@ fun parseInline(
         append(c)
         i++
     }
+}
+
+private fun findLinkDestinationEnd(source: String, from: Int): Int {
+    var depth = 1
+    var i = from
+    while (i < source.length) {
+        when (source[i]) {
+            '\\' -> i += 2
+            '\n', '\r' -> return -1
+            '(' -> {
+                depth++
+                i++
+            }
+            ')' -> {
+                depth--
+                if (depth == 0) return i
+                i++
+            }
+            else -> i++
+        }
+    }
+    return -1
 }
 
 private fun findBoldEnd(source: String, from: Int): Int {
