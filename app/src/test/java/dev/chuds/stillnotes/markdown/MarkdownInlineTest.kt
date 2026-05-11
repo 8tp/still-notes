@@ -46,6 +46,13 @@ class MarkdownInlineTest {
     }
 
     @Test
+    fun extractTagsIgnoresHashMarkersInsideMultiBacktickInlineCodeSpans() {
+        val tags = extractTags("Keep #public, ignore ``#private`` and ``one ` tick #also_private``, then #later.")
+
+        assertEquals(listOf("public", "later"), tags)
+    }
+
+    @Test
     fun extractTagsIgnoresHashMarkersInsideFencedCodeBlocks() {
         val tags = extractTags(
             """

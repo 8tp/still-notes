@@ -103,10 +103,12 @@ private fun String.withoutInlineCodeSpans(): String {
     var i = 0
     while (i < length) {
         if (this[i] == '`') {
-            val end = indexOf('`', startIndex = i + 1)
-            if (end != -1) {
-                repeat(end - i + 1) { out.append(' ') }
-                i = end + 1
+            val runLength = countBacktickRun(i)
+            val closeStart = findClosingBacktickRun(i + runLength, runLength)
+            if (closeStart != -1) {
+                val closeEnd = closeStart + runLength
+                repeat(closeEnd - i) { out.append(' ') }
+                i = closeEnd
                 continue
             }
         }
@@ -114,4 +116,30 @@ private fun String.withoutInlineCodeSpans(): String {
         i++
     }
     return out.toString()
+}
+
+private fun String.countBacktickRun(start: Int): Int {
+    var end = start
+    while (end < length && this[end] == '`') {
+        end++
+    }
+    return end - start
+}
+
+private fun String.findClosingBacktickRun(start: Int, runLength: Int): Int {
+    var i = start
+    while (i < length) {
+        if (this[i] != '`') {
+            i++
+            continue
+        }
+
+        val candidateStart = i
+        val candidateLength = countBacktickRun(candidateStart)
+        if (candidateLength == runLength) {
+            return candidateStart
+        }
+        i = candidateStart + candidateLength
+    }
+    return -1
 }
