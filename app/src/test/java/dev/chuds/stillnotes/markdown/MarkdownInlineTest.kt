@@ -45,6 +45,22 @@ class MarkdownInlineTest {
         assertEquals(listOf("public", "later-tag"), tags)
     }
 
+    @Test
+    fun extractTagsIgnoresHashMarkersInsideFencedCodeBlocks() {
+        val tags = extractTags(
+            """
+            Keep #public.
+            ```
+            #private
+            val x = "#also_private"
+            ```
+            Then keep #later.
+            """.trimIndent(),
+        )
+
+        assertEquals(listOf("public", "later"), tags)
+    }
+
     private fun AnnotatedString.hasSpan(
         text: String,
         predicate: (androidx.compose.ui.text.SpanStyle) -> Boolean,
