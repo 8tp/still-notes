@@ -125,7 +125,7 @@ private fun String.withoutMarkdownLinkDestinations(): String {
     val out = StringBuilder(length)
     var i = 0
     while (i < length) {
-        if (this[i] == ']' && i + 1 < length && this[i + 1] == '(') {
+        if (this[i] == ']' && i + 1 < length && this[i + 1] == '(' && hasMarkdownLinkLabelStart(i)) {
             val destinationStart = i + 2
             val destinationEnd = findMarkdownLinkDestinationEnd(destinationStart)
             if (destinationEnd != -1) {
@@ -143,6 +143,18 @@ private fun String.withoutMarkdownLinkDestinations(): String {
         i++
     }
     return out.toString()
+}
+
+private fun String.hasMarkdownLinkLabelStart(labelEnd: Int): Boolean {
+    var i = labelEnd - 1
+    while (i >= 0) {
+        when (this[i]) {
+            '[' -> return true
+            ']', '\n', '\r' -> return false
+        }
+        i--
+    }
+    return false
 }
 
 private fun String.findMarkdownLinkDestinationEnd(start: Int): Int {

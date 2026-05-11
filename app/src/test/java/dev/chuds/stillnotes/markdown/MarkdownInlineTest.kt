@@ -111,6 +111,13 @@ class MarkdownInlineTest {
     }
 
     @Test
+    fun extractTagsKeepsHashMarkersAfterMalformedLinkClose() {
+        val tags = extractTags("Malformed ](#todo) still visible, but [site](https://example.com/#hidden) is not. #later")
+
+        assertEquals(listOf("todo", "later"), tags)
+    }
+
+    @Test
     fun parsesNestedParenthesesInMarkdownLinkDestinations() {
         val parsed = parseInline(
             source = "[site](https://example.com/a_(b)#hidden) #public",
