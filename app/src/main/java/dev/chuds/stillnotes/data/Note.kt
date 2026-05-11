@@ -61,10 +61,28 @@ private val TAG_REGEX = Regex("(?:^|[^A-Za-z0-9_#])#([A-Za-z][A-Za-z0-9_-]{0,40}
 
 fun extractTags(body: String): List<String> {
     val seen = LinkedHashSet<String>()
-    TAG_REGEX.findAll(body).forEach { match ->
+    TAG_REGEX.findAll(body.withoutInlineCodeSpans()).forEach { match ->
         // Skip "# heading" pattern: a hash at line start followed by a space.
         val tag = match.groupValues[1]
         seen += tag.lowercase()
     }
     return seen.toList()
+}
+
+private fun String.withoutInlineCodeSpans(): String {
+    val out = StringBuilder(length)
+    var i = 0
+    while (i < length) {
+        if (this[i] == '`') {
+            val end = indexOf('`', startIndex = i + 1)
+            if (end != -1) {
+                repeat(end - i + 1) { out.append(' ') }
+                i = end + 1
+                continue
+            }
+        }
+        out.append(this[i])
+        i++
+    }
+    return out.toString()
 }
