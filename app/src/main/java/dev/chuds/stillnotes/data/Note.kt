@@ -72,29 +72,52 @@ fun extractTags(body: String): List<String> {
 
 private fun String.withoutCodeSpans(): String {
     val out = StringBuilder(length)
+    val plain = StringBuilder()
     var lineStart = 0
     var inFence = false
+
+    fun flushPlain() {
+        if (plain.isEmpty()) return
+        out.append(plain.toString().withoutInlineCodeSpans())
+        plain.clear()
+    }
 
     while (lineStart <= length) {
         val newline = indexOf('\n', startIndex = lineStart)
         val lineEnd = if (newline == -1) length else newline
         val line = substring(lineStart, lineEnd)
         val isFence = CODE_FENCE.matchEntire(line.trimEnd()) != null
+        val wasInFence = inFence
+        val appendedToPlain: Boolean
 
         when {
             isFence -> {
+                flushPlain()
                 repeat(line.length) { out.append(' ') }
                 inFence = !inFence
+                appendedToPlain = false
             }
-            inFence -> repeat(line.length) { out.append(' ') }
-            else -> out.append(line.withoutInlineCodeSpans())
+            wasInFence -> {
+                repeat(line.length) { out.append(' ') }
+                appendedToPlain = false
+            }
+            line.isBlank() -> {
+                flushPlain()
+                out.append(line)
+                appendedToPlain = false
+            }
+            else -> {
+                plain.append(line)
+                appendedToPlain = true
+            }
         }
 
         if (newline == -1) break
-        out.append('\n')
+        if (appendedToPlain) plain.append('\n') else out.append('\n')
         lineStart = newline + 1
     }
 
+    flushPlain()
     return out.toString()
 }
 

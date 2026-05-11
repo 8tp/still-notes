@@ -53,6 +53,18 @@ class MarkdownInlineTest {
     }
 
     @Test
+    fun extractTagsIgnoresHashMarkersInsideMultilineInlineCodeSpans() {
+        val tags = extractTags(
+            """
+            Keep #public before `#private
+            #also_private` and #later.
+            """.trimIndent(),
+        )
+
+        assertEquals(listOf("public", "later"), tags)
+    }
+
+    @Test
     fun extractTagsIgnoresHashMarkersInsideFencedCodeBlocks() {
         val tags = extractTags(
             """
