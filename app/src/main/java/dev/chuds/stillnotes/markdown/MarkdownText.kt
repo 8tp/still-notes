@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import dev.chuds.stillnotes.ui.theme.LocalStillTypography
 import dev.chuds.stillnotes.ui.theme.StillColors
 import dev.chuds.stillnotes.ui.theme.StillTypography
-import java.net.URI
 import java.util.Locale
 
 /**
@@ -274,8 +273,10 @@ private fun openUrl(context: Context, url: String) {
     }
 }
 
+private val SchemeRegex = Regex("^([A-Za-z][A-Za-z0-9+.\\-]*):")
+
 internal fun isBrowserUrl(url: String): Boolean {
-    val scheme = runCatching { URI(url).scheme?.lowercase(Locale.US) }.getOrNull()
+    val scheme = SchemeRegex.find(url)?.groupValues?.get(1)?.lowercase(Locale.US)
         ?: return false
     return scheme == "http" || scheme == "https"
 }

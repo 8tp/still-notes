@@ -34,11 +34,12 @@ fun parseInline(
     while (i < n) {
         val c = source[i]
 
-        // Inline code: `foo bar`
+        // Inline code: `foo bar` or ``foo`bar`` — match the indexer in Note.kt.
         if (c == '`') {
-            val end = source.indexOf('`', i + 1)
-            if (end != -1) {
-                val text = source.substring(i + 1, end)
+            val runLength = countBacktickRun(source, i)
+            val closeStart = findClosingBacktickRun(source, i + runLength, runLength)
+            if (closeStart != -1) {
+                val text = source.substring(i + runLength, closeStart)
                 pushStyle(
                     SpanStyle(
                         fontFamily = monoFont ?: FontFamily.Monospace,
@@ -49,7 +50,7 @@ fun parseInline(
                 )
                 append(text)
                 pop()
-                i = end + 1
+                i = closeStart + runLength
                 continue
             }
         }
@@ -146,6 +147,31 @@ private fun findItalicEnd(source: String, from: Int, marker: Char): Int {
             return i
         }
         i++
+    }
+    return -1
+}
+
+private fun countBacktickRun(source: String, start: Int): Int {
+    var end = start
+    while (end < source.length && source[end] == '`') {
+        end++
+    }
+    return end - start
+}
+
+private fun findClosingBacktickRun(source: String, start: Int, runLength: Int): Int {
+    var i = start
+    while (i < source.length) {
+        if (source[i] != '`') {
+            i++
+            continue
+        }
+        val candidateStart = i
+        val candidateLength = countBacktickRun(source, candidateStart)
+        if (candidateLength == runLength) {
+            return candidateStart
+        }
+        i = candidateStart + candidateLength
     }
     return -1
 }

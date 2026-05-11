@@ -39,6 +39,38 @@ class MarkdownInlineTest {
     }
 
     @Test
+    fun rendersMultiBacktickInlineCodeSpansAsCode() {
+        val codeColor = Color(0xFFECECEC)
+        val codeBackground = Color(0xFF202020)
+        val parsed = parseInline(
+            source = "before ``#hidden`` after",
+            monoFont = null,
+            codeColor = codeColor,
+            codeBackground = codeBackground,
+            linkColor = Color.Cyan,
+        )
+
+        assertEquals("before #hidden after", parsed.text)
+        assertTrue(parsed.hasSpan("#hidden") { it.color == codeColor && it.background == codeBackground })
+    }
+
+    @Test
+    fun rendersMultiBacktickInlineCodeSpansContainingLiteralBackticks() {
+        val codeColor = Color(0xFFECECEC)
+        val codeBackground = Color(0xFF202020)
+        val parsed = parseInline(
+            source = "see ``one ` tick`` here",
+            monoFont = null,
+            codeColor = codeColor,
+            codeBackground = codeBackground,
+            linkColor = Color.Cyan,
+        )
+
+        assertEquals("see one ` tick here", parsed.text)
+        assertTrue(parsed.hasSpan("one ` tick") { it.color == codeColor && it.background == codeBackground })
+    }
+
+    @Test
     fun extractTagsIgnoresHashMarkersInsideInlineCodeSpans() {
         val tags = extractTags("Keep #Public, ignore `#private #also_private`, then keep #later-tag.")
 

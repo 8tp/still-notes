@@ -35,11 +35,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import dev.chuds.stillnotes.markdown.MarkdownBlockContent
 import dev.chuds.stillnotes.markdown.parseBlocks
 import dev.chuds.stillnotes.ui.components.StillVerb
 import dev.chuds.stillnotes.ui.theme.StillColors
 import dev.chuds.stillnotes.ui.theme.StillTypography
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 
 /**
@@ -65,7 +67,9 @@ fun NoteScreen(
     val scope = rememberCoroutineScope()
 
     DisposableEffect(viewModel) {
-        onDispose { scope.launch { viewModel.flush() } }
+        onDispose {
+            viewModel.viewModelScope.launch(NonCancellable) { viewModel.flush() }
+        }
     }
 
     LaunchedEffect(loaded, editing) {
