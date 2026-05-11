@@ -4,7 +4,7 @@
 
 #### A quiet markdown notebook for Android.
 
-part of the [still](../STILL.md) family. the pact governs every line of code in this repo.
+part of the [still](STILL.md) family. the pact governs every line of code in this repo.
 
 <br>
 
