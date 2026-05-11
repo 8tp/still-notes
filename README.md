@@ -4,6 +4,8 @@
 
 #### A quiet markdown notebook for Android.
 
+part of the [still](../STILL.md) family. the pact governs every line of code in this repo.
+
 <br>
 
 <img src="docs/screenshots/list.png" width="180" alt="Notes list — title, snippet, relative time, and inline tags per row">&nbsp;<img src="docs/screenshots/note-preview.png" width="180" alt="Note preview — rendered markdown with headings and fenced code blocks">&nbsp;<img src="docs/screenshots/note-edit.png" width="180" alt="Note editor — raw markdown in a monospace editor with word and character count">&nbsp;<img src="docs/screenshots/settings.png" width="180" alt="Settings — font preset, preview-by-default, import, export, privacy posture">
