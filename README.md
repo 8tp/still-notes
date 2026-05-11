@@ -4,6 +4,8 @@
 
 #### A quiet markdown notebook for Android.
 
+part of the [still](STILL.md) family. the pact governs every line of code in this repo.
+
 <br>
 
 <img src="docs/screenshots/list.png" width="180" alt="Notes list — title, snippet, relative time, and inline tags per row">&nbsp;<img src="docs/screenshots/note-preview.png" width="180" alt="Note preview — rendered markdown with headings and fenced code blocks">&nbsp;<img src="docs/screenshots/note-edit.png" width="180" alt="Note editor — raw markdown in a monospace editor with word and character count">&nbsp;<img src="docs/screenshots/settings.png" width="180" alt="Settings — font preset, preview-by-default, import, export, privacy posture">
@@ -23,7 +25,7 @@ It declares no internet permission. It ships no analytics. It depends on neither
 - A reverse-chronological list of notes, pinned ones floating to the top, each row showing **title, snippet, relative time, and inline `#tags`**.
 - Per-note **edit** and **preview** modes. Edit is raw markdown in a monospace editor with a live word and character count. Preview renders the same text into headings, paragraphs, lists, blockquotes, and fenced code blocks.
 - A small in-house markdown renderer covers `# ## ###` headings, paragraphs with `**bold**`, `*italic*`, `` `inline code` ``, `[links](url)`, bullet and ordered lists, blockquotes, horizontal rules, and fenced ```` ``` ```` code blocks with optional language hints, hairline border, monospace body, and horizontal scroll for long lines.
-- **Tags are markdown.** Anywhere you write `#word` in a note, it becomes a tag. The list shows a horizontal tag row at the top — tap one to filter the list to notes that mention it. No separate tag manager, no folder hierarchy.
+- **Tags are markdown.** A `#word` in prose becomes a tag; `#word` inside inline code or fenced code is ignored. The list shows a horizontal tag row at the top — tap one to filter the list to notes that mention it. No separate tag manager, no folder hierarchy.
 - **Search across the index** by title, body, or tag. One sentence and the list narrows.
 - **Long-press a code block to copy it** to the clipboard. **Tap a link** in preview to open it in your browser. (Still Notes itself has no `INTERNET` permission — the URL is handed to the system to resolve.)
 - **Import and export** through the Storage Access Framework: pick `.md` files into the notebook, save a single note out as `.md`, or save the entire notebook as one `.zip` of `.md` files. No app-defined storage location, no provider — the system file picker decides where the bytes land.

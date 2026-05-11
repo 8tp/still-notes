@@ -149,8 +149,18 @@ fun NoteScreen(
                     onBack()
                 }
             },
-            onShare = onShare,
-            onExport = onExport,
+            onShare = {
+                scope.launch {
+                    viewModel.flush()
+                    onShare()
+                }
+            },
+            onExport = {
+                scope.launch {
+                    viewModel.flush()
+                    onExport()
+                }
+            },
             onToggleMode = {
                 if (editing) {
                     scope.launch {
